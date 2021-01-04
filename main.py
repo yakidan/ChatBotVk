@@ -50,7 +50,7 @@ for event in longpoll.listen():
                 if request[0].lower() == "#тренировка" or request[0].lower() == "#треня":  #
                     question = BotVk.get_question_for_simple_training(request)  # получение заголовка к опросу
                     answers = BotVk.get_answers_for_simple_training(
-                        BotVk)  # получение заголовка к опросуполучение ответов к опросу
+                        BotVk)  # получение ответов к опросу
                     poll = create_poll_for_simple_training(question, answers)  # создание опроса
                     attachment = 'poll' + str(poll['owner_id']) + '_' + str(poll['id'])  # идентификатор опроса
                     send_poll_in_chat(event.chat_id, random.randint(1, 100000), attachment)  # отправка опроса

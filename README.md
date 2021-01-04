@@ -1,4 +1,4 @@
-#Simple Bot for chat VK
+# Simple Bot for chat VK
 ### Functional
 - Sending some polls in chat VK
 #### Command for instruction:
