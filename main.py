@@ -11,9 +11,9 @@ def create_and_send_poll_every_day(chat_id, question=BotVk.get_question_for_lomo
                                    answers=BotVk.get_answers_for_simple_training(
                                        BotVk)):  # метод, который вызывается каждый день, так как установлен в планировщике задач
     try:
-        poll = create_poll_for_simple_training(question, answers)
-        attachment = 'poll' + str(poll['owner_id']) + '_' + str(poll['id'])
-        send_poll_in_chat(chat_id, random.randint(1, 100000), attachment)
+        poll = create_poll_for_simple_training(question, answers)  # создание опроса
+        attachment = 'poll' + str(poll['owner_id']) + '_' + str(poll['id'])  # идентификатор опроса
+        send_poll_in_chat(chat_id, get_random_id(), attachment)  # отправка опроса
     except Exception:
         print("Don't working send_poll_every_day")
 
@@ -26,7 +26,7 @@ def send_poll_in_all_chat_every_day():  # метод, который вызыв�
         items = obj_chats['items']
         for i in range(count):
             id = items[i]['conversation']['peer']['id']  # чата
-            id = id % 2000000000
+            id = id % BotVk.module_id
             if id > 0:  # берем только чаты, а не диалоги
                 create_and_send_poll_every_day(id)
     except Exception:
@@ -42,7 +42,7 @@ def send_poll_in_all_different_chat_every_day():  # метод, который �
         for i in range(count):
             id = items[i]['conversation']['peer']['id']
             title = items[i]['conversation']['chat_settings']['title']  # название чата
-            id = id % 2000000000
+            id = id % BotVk.module_id
             if id > 0:  # берем только чаты, а не диалоги
                 if title == BotVk.man_chat:  # название чата
                     create_and_send_poll_every_day(id, )  # сама отправка конкретного опроса
@@ -51,6 +51,7 @@ def send_poll_in_all_different_chat_every_day():  # метод, который �
                 # Если хотите добавить , то прописываете elif название часа и метод отправки опроса
     except Exception:
         print("Don't working send_poll_in_all_different_chat_every_day")
+
 
 def register_poll_in_all_different_chat_every_day():  # метод, который вызывается каждый день, так как установлен в планировщике задач
     # Отсылает в каждый чат свой уникальный опрос
@@ -61,17 +62,18 @@ def register_poll_in_all_different_chat_every_day():  # метод, которы
         for i in range(count):
             id = items[i]['conversation']['peer']['id']
             title = items[i]['conversation']['chat_settings']['title']  # название чата
-            id = id % 2000000000
+            id = id % BotVk.module_id
             if id > 0:  # берем только чаты, а не диалоги
                 if title == BotVk.chat1:  # название чата
-                    schedule.every().day.at("10:59").do(create_and_send_poll_every_day, id)
+                    schedule.every().day.at(BotVk.time_sending_poll_in_man_chat).do(create_and_send_poll_every_day, id)
                     # регистрируем отправку конкретного сообщения в конкретное время, название опроса  - дефолтное
                 elif title == BotVk.chat2:
-                    schedule.every().day.at("10:59").do(create_and_send_poll_every_day, id,"Hello world")
+                    schedule.every().day.at(BotVk.time_sending_poll_in_woman_chat).do(create_and_send_poll_every_day, id, "Hello world")
                     # регистрируем отправку конкретного сообщения в конкретное время
                 # Если хотите добавить , то прописываете elif название часа и метод отправки опроса
     except Exception:
         print("Don't working send_poll_in_all_different_chat_every_day")
+
 
 def get_сonversations():
     return vk.method('messages.getConversations')
@@ -103,6 +105,9 @@ def get_random_background():
         r = random.randint(1, 9)
     return r
 
+def get_random_id():
+    return random.randint(1, 100000)
+
 def run_listen():
     try:
         for event in longpoll.listen():
@@ -115,47 +120,36 @@ def run_listen():
                             question = BotVk.get_question_for_simple_training(request)  # получение заголовка к опросу
                             answers = BotVk.get_answers_for_simple_training(
                                 BotVk)  # получение ответов к опросу
-                            poll = create_poll_for_simple_training(question, answers)  # создание опроса
-                            attachment = 'poll' + str(poll['owner_id']) + '_' + str(poll['id'])  # идентификатор опроса
-                            send_poll_in_chat(event.chat_id, random.randint(1, 100000), attachment)  # отправка опроса
+                            create_and_send_poll_every_day(event.chat_id, question, answers)
                         elif request[0].lower() == "#треняломострела" or request[0].lower() == "#тренястрелаломо":
                             question = BotVk.get_question_for_lomo_training_next_day(BotVk)
                             if len(request) > 1:
                                 question = BotVk.get_question_for_lomo_training(BotVk, ''.join(request[1:]))
                             answers = BotVk.get_answers_for_simple_training(BotVk)
-                            poll = create_poll_for_simple_training(question, answers)
-                            attachment = 'poll' + str(poll['owner_id']) + '_' + str(poll['id'])
-                            send_poll_in_chat(event.chat_id, random.randint(1, 100000), attachment)
+                            create_and_send_poll_every_day(event.chat_id, question, answers)
 
                             question = BotVk.get_question_for_strela_training_next_day(BotVk)
                             if len(request) > 1:
                                 question = BotVk.get_question_for_lomo_training(BotVk, ''.join(request[1:]))
                             answers = BotVk.get_answers_for_simple_training(BotVk)
-                            poll = create_poll_for_simple_training(question, answers)
-                            attachment = 'poll' + str(poll['owner_id']) + '_' + str(poll['id'])
-                            send_poll_in_chat(event.chat_id, random.randint(1, 100000), attachment)
-
+                            create_and_send_poll_every_day(event.chat_id, question, answers)
                         elif request[0].lower() == "#треняломо":
                             question = BotVk.get_question_for_lomo_training_next_day(BotVk)
                             if len(request) > 1:
                                 question = BotVk.get_question_for_lomo_training(BotVk, ''.join(request[1:]))
                             answers = BotVk.get_answers_for_simple_training(BotVk)
-                            poll = create_poll_for_simple_training(question, answers)
-                            attachment = 'poll' + str(poll['owner_id']) + '_' + str(poll['id'])
-                            send_poll_in_chat(event.chat_id, random.randint(1, 100000), attachment)
+                            create_and_send_poll_every_day(event.chat_id, question, answers)
                         elif request[0].lower() == "#тренястрела":
                             question = BotVk.get_question_for_strela_training_next_day(BotVk)
                             if len(request) > 1:
                                 question = BotVk.get_question_for_strela_training(BotVk, ''.join(request[1:]))
                             answers = BotVk.get_answers_for_simple_training(BotVk)
-                            poll = create_poll_for_simple_training(question, answers)
-                            attachment = 'poll' + str(poll['owner_id']) + '_' + str(poll['id'])
-                            send_poll_in_chat(event.chat_id, random.randint(1, 100000), attachment)
-                        elif request[0].lower() == "#хелп" or request[0].lower() == "#помощь" or request[
-                            0].lower() == "#help":
-                            write_msg_chat(event.chat_id, random.randint(1, 1000000), BotVk.get_message_help(BotVk))
+                            create_and_send_poll_every_day(event.chat_id, question, answers)
+                        elif request[0].lower() == "#хелп" or request[0].lower() == "#помощь" or request[0].lower() == "#help":
+                            write_msg_chat(event.chat_id, get_random_id(), BotVk.get_message_help(BotVk))
     except Exception:
         print("Don't working listen messages")
+
 
 # API-ключ с
 f = open("token.txt")  # тут содержится токен, он необходим для подключения
@@ -180,7 +174,7 @@ register_poll_in_all_different_chat_every_day()
 # send_poll_in_all_different_chat_every_day()
 # отправляем одинаковый опрос во все чаты
 # schedule.every().day.at("10:30").do(create_and_send_poll_every_day, 4)
-# регистрируем вызов метода в планировщике задаче, вызываемый каждый день
+# регистрируем вызов метода в планировщике задаче, вызываемый каждый день в конкретное время
 # второй параметр это число - конкретный chat_id, куда необходимо отправить опрос в 10:30
 
 while True:
