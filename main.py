@@ -6,7 +6,6 @@ import schedule
 from vk_api.longpoll import VkLongPoll, VkEventType
 from bot_vk import BotVk
 
-
 def create_and_send_poll_every_day(chat_id, question=BotVk.get_question_for_lomo_training_next_day(BotVk),
                                    answers=BotVk.get_answers_for_simple_training(
                                        BotVk)):  # метод, который вызывается каждый день, так как установлен в планировщике задач

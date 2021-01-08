@@ -1,6 +1,12 @@
 # Simple Bot for chat VK
 
-### Functional
+## Setup intruction
+
+### Install Required Python Modules
+``
+pip install -r requirements.txt
+``
+## Functional
 - Sending some polls in chat VK
 
 #### Command for instruction:
